@@ -21,6 +21,7 @@ public class UDPServer {
 
 		switch (getHTTPMethod(receiveMessage)) {
 		case GET:
+
 			/* Send initial header including file size */
 			File requestedFile = getAssociatedFile(receiveMessage);
 
@@ -31,6 +32,8 @@ public class UDPServer {
 			DatagramPacket sendPacket = new DatagramPacket(sendBuffer,
 					sendBuffer.length, clientIPAddress, clientPort);
 
+			System.out.println("Sending packet: "
+					+ new String(sendPacket.getData()));
 			socket.send(sendPacket);
 
 			/* Send all bytes until end of file */
@@ -40,20 +43,28 @@ public class UDPServer {
 				sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length,
 						clientIPAddress, clientPort);
 
+				System.out.println("Sending packet: "
+						+ new String(sendPacket.getData()));
+
 				socket.send(sendPacket);
+
+				sendBuffer = new byte[128];
+
 			}
 
 			/* Send null character */
 			byte[] nullEnd = new byte[1];
 			nullEnd[0] = 0;
 
-			sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length,
+			sendPacket = new DatagramPacket(nullEnd, nullEnd.length,
 					clientIPAddress, clientPort);
+
+			System.out.println("Sending null-terminating packet");
 
 			socket.send(sendPacket);
 			break;
 		default:
-			//potential sending error if method is invalid
+			// potential sending error if method is invalid
 			throw new java.lang.IllegalArgumentException();
 		}
 	}

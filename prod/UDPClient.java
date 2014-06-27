@@ -3,22 +3,24 @@ package prod;
 import java.io.*;
 import java.net.*;
 
-class UDPClient {
-	public static void main(String args[]) throws Exception {
 
-		BufferedReader inFromUser = new BufferedReader(new InputStreamReader(
-				System.in));
+class UDPClient {
+	final static int bufferSize = 128;
+	
+	public static void main(String args[]) throws Exception {
 
 		DatagramSocket clientSocket = new DatagramSocket();
 
 		// For testing purposes, we can set this name to our own PC's name.
-		InetAddress IPAddress = InetAddress.getByName("tux194");
+		InetAddress IPAddress = InetAddress.getByName("Carlos-PC");
 
-		byte[] sendData = new byte[1024];
-		byte[] receiveData = new byte[1024];
+		byte[] sendData = new byte[bufferSize];
+		byte[] receiveData = new byte[bufferSize];
 
-		String sentence = inFromUser.readLine();
-		sendData = sentence.getBytes();
+		//String sentence = inFromUser.readLine();
+		String httpGetRequest = "GET res/constitution.htm HTTP/1.0";
+
+		sendData = httpGetRequest.getBytes();
 
 		DatagramPacket sendPacket = new DatagramPacket(sendData,
 				sendData.length, IPAddress, 10034);
@@ -32,10 +34,21 @@ class UDPClient {
 
 		// Operation waits until server sends back a response
 		clientSocket.receive(receivePacket);
+		
+		byte[] response = receivePacket.getData();
+		
+		FileOutputStream out = new FileOutputStream("constitution.htm");
+		String responseString;
+		while (receivePacket.getLength() > 1 && response[0] != 0)
+		{
+			responseString = new String(response);
+			System.out.println(responseString);
+			out.write(response);
+			clientSocket.receive(receivePacket);
+			response = receivePacket.getData();
 
-		String modifiedSentence = new String(receivePacket.getData());
-
-		System.out.println("FROM SERVER: " + modifiedSentence);
+		}
+		out.close();
 		clientSocket.close();
 	}
 }
