@@ -12,7 +12,7 @@ class UDPClient {
 		DatagramSocket clientSocket = new DatagramSocket();
 
 		// For testing purposes, we can set this name to our own PC's name.
-		InetAddress IPAddress = InetAddress.getByName("Carlos-PC");
+		InetAddress IPAddress = InetAddress.getByName("tux192");
 
 		byte[] sendData = new byte[bufferSize];
 		byte[] receiveData = new byte[bufferSize];
